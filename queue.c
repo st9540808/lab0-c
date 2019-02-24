@@ -69,20 +69,26 @@ bool q_insert_head(queue_t *q, char *s)
     char *new_value;
 
     /* What should you do if the q is NULL? */
-    if (q == NULL)
+    if (!q)
         return false;
 
     newh = malloc(sizeof(list_ele_t));
+    if (!newh)
+        return false;
+
     new_value = strdup(s);
-    if (newh == NULL || new_value == NULL) {
+    if (!new_value) {
         free(newh);
-        free(new_value);
         return false;
     }
 
     newh->value = new_value;
     newh->next = q->head;
     q->head = newh;
+    if (q->size == 0)
+        q->tail = newh;
+    q->size++;
+
     return true;
 }
 
@@ -98,7 +104,34 @@ bool q_insert_tail(queue_t *q, char *s)
 {
     /* You need to write the complete code for this function */
     /* Remember: It should operate in O(1) time */
-    return false;
+    list_ele_t *newh;
+    char *new_value;
+
+    if (!q)
+        return false;
+
+    newh = malloc(sizeof(list_ele_t));
+    if (!newh)
+        return false;
+
+    new_value = strdup(s);
+    if (!new_value) {
+        free(newh);
+        return false;
+    }
+
+    newh->value = new_value;
+    newh->next = NULL;
+    if (q->size == 0) {
+        q->head = newh;
+        q->tail = newh;
+    } else {
+        q->tail->next = newh;
+        q->tail = newh;
+    }
+    q->size++;
+
+    return true;
 }
 
 /*
@@ -126,6 +159,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 
     free(elem->value);
     free(elem);
+    q->size--;
     return true;
 }
 
@@ -137,7 +171,9 @@ int q_size(queue_t *q)
 {
     /* You need to write the code for this function */
     /* Remember: It should operate in O(1) time */
-    return 0;
+    if (!q)
+        return 0;
+    return q->size;
 }
 
 /*
@@ -150,4 +186,23 @@ int q_size(queue_t *q)
 void q_reverse(queue_t *q)
 {
     /* You need to write the code for this function */
+    list_ele_t *prev, *curr, *next;
+
+    if (!q || q->size <= 1)
+        return;
+
+    prev = NULL;
+    curr = q->head;
+    next = q->head->next;
+
+    while (next) {
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+        next = next->next;
+    }
+
+    curr->next = prev;
+    q->tail = q->head;
+    q->head = curr;
 }
