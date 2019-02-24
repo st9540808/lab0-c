@@ -147,7 +147,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
     /* You need to fix up this code. */
     list_ele_t *elem;
 
-    if (q == NULL || q->head == NULL)
+    if (!q || !q->head)
         return false;
 
     elem = q->head;
